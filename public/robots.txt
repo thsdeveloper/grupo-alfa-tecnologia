@@ -1,0 +1,35 @@
+# Robots.txt - Grupo Alfa Tecnologia
+# Otimizado para SEO de Ata de Registro de Preço
+
+User-agent: *
+Allow: /
+Allow: /ata-registro-preco
+
+# Sitemap
+Sitemap: https://www.grupoalfatecnologia.com.br/sitemap.xml
+
+# Diretórios a serem ignorados
+Disallow: /api/
+Disallow: /_next/static/
+Disallow: /_next/image
+
+# Crawl-delay para não sobrecarregar o servidor
+Crawl-delay: 1
+
+# Permitir indexação de recursos importantes
+User-agent: Googlebot
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.webp$
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
