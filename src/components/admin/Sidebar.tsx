@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils"
 import {
   LayoutDashboard,
   User,
-  Settings,
+  FileText,
+  Package,
   ChevronLeft,
   ChevronRight
 } from "lucide-react"
@@ -22,6 +23,16 @@ const menuItems = [
     title: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Termos de Referência",
+    href: "/admin/termos",
+    icon: FileText,
+  },
+  {
+    title: "Equipamentos",
+    href: "/admin/equipamentos",
+    icon: Package,
   },
   {
     title: "Meu Perfil",
