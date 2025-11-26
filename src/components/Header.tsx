@@ -1,10 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User, LogOut, LayoutDashboard, LogIn } from "lucide-react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string | null; avatar_url: string | null } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const supabase = createClient();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -13,6 +31,57 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    // Check initial auth state
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", user.id)
+          .single();
+        setProfile(profile);
+      }
+      setLoading(false);
+    };
+
+    getUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", session.user.id)
+          .single();
+        setProfile(profile);
+      } else {
+        setProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
+
+  const displayName = profile?.full_name || user?.email?.split("@")[0] || "Usuário";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   const navLinks = [
     { href: "#sobre", label: "Sobre", title: "Conheça o Grupo Alfa Tecnologia" },
@@ -69,42 +138,161 @@ export default function Header() {
             >
               Solicitar Contato
             </a>
+
+            {/* Auth Section */}
+            {!loading && (
+              <>
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="flex items-center gap-2 rounded-full hover:ring-2 hover:ring-[#b6c72c]/50 transition-all focus:outline-none focus:ring-2 focus:ring-[#b6c72c]">
+                      <Avatar className="h-9 w-9 border-2 border-[#b6c72c]">
+                        <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
+                        <AvatarFallback className="bg-[#b6c72c] text-[#211915] font-semibold text-sm">
+                          {initials}
+                        </AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">{displayName}</p>
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="cursor-pointer">
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          <span>Painel Admin</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/profile" className="cursor-pointer">
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Meu Perfil</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={handleSignOut}
+                        className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sair</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-2 text-white/90 hover:text-[#b6c72c] transition-colors text-sm font-medium border border-white/20 hover:border-[#b6c72c]/50 px-4 py-2 rounded-full"
+                    title="Acessar área administrativa"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Entrar
+                  </Link>
+                )}
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden text-white p-2"
-            aria-label="Menu"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="lg:hidden flex items-center gap-3">
+            {/* Mobile Auth */}
+            {!loading && (
+              <>
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="flex items-center rounded-full hover:ring-2 hover:ring-[#b6c72c]/50 transition-all focus:outline-none focus:ring-2 focus:ring-[#b6c72c]">
+                      <Avatar className="h-8 w-8 border-2 border-[#b6c72c]">
+                        <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
+                        <AvatarFallback className="bg-[#b6c72c] text-[#211915] font-semibold text-xs">
+                          {initials}
+                        </AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">{displayName}</p>
+                          <p className="text-xs leading-none text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="cursor-pointer">
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          <span>Painel Admin</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/profile" className="cursor-pointer">
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Meu Perfil</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={handleSignOut}
+                        className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sair</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="text-white/90 hover:text-[#b6c72c] transition-colors p-2"
+                    title="Acessar área administrativa"
+                  >
+                    <LogIn className="h-5 w-5" />
+                  </Link>
+                )}
+              </>
+            )}
+
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-white p-2"
+              aria-label="Menu"
             >
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {isMobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
         </nav>
 
         {/* Mobile Menu */}
         <div
-          className={`lg:hidden transition-all duration-300 overflow-hidden ${isMobileMenuOpen ? "max-h-96 opacity-100 mt-4" : "max-h-0 opacity-0"
+          className={`lg:hidden transition-all duration-300 overflow-hidden ${isMobileMenuOpen ? "max-h-[500px] opacity-100 mt-4" : "max-h-0 opacity-0"
             }`}
         >
           <div className="bg-[#211915]/95 backdrop-blur-md rounded-2xl p-4 flex flex-col gap-2">
@@ -125,6 +313,18 @@ export default function Header() {
             >
               Solicitar Contato
             </a>
+
+            {/* Mobile Login Link */}
+            {!loading && !user && (
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 text-white/90 hover:text-[#b6c72c] transition-colors py-3 px-4 rounded-lg hover:bg-white/5 border border-white/20 mt-2"
+              >
+                <LogIn className="h-4 w-4" />
+                Entrar na Área Admin
+              </Link>
+            )}
           </div>
         </div>
       </div>
