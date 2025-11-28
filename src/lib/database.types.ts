@@ -14,6 +14,182 @@ export type Database = {
   }
   public: {
     Tables: {
+      ata_itens: {
+        Row: {
+          ata_id: string
+          ativo: boolean | null
+          created_at: string | null
+          descricao: string
+          id: string
+          lote_id: string | null
+          numero_item: string
+          ordem: number | null
+          preco_unitario: number | null
+          quantidade: number | null
+          unidade: string
+          updated_at: string | null
+        }
+        Insert: {
+          ata_id: string
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao: string
+          id?: string
+          lote_id?: string | null
+          numero_item: string
+          ordem?: number | null
+          preco_unitario?: number | null
+          quantidade?: number | null
+          unidade?: string
+          updated_at?: string | null
+        }
+        Update: {
+          ata_id?: string
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string
+          id?: string
+          lote_id?: string | null
+          numero_item?: string
+          ordem?: number | null
+          preco_unitario?: number | null
+          quantidade?: number | null
+          unidade?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ata_itens_ata_id_fkey"
+            columns: ["ata_id"]
+            isOneToOne: false
+            referencedRelation: "atas_registro_preco"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ata_itens_lote_id_fkey"
+            columns: ["lote_id"]
+            isOneToOne: false
+            referencedRelation: "ata_lotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ata_lotes: {
+        Row: {
+          ata_id: string
+          ativo: boolean | null
+          created_at: string | null
+          descricao: string | null
+          id: string
+          numero: string
+          ordem: number | null
+        }
+        Insert: {
+          ata_id: string
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          numero: string
+          ordem?: number | null
+        }
+        Update: {
+          ata_id?: string
+          ativo?: boolean | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          numero?: string
+          ordem?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ata_lotes_ata_id_fkey"
+            columns: ["ata_id"]
+            isOneToOne: false
+            referencedRelation: "atas_registro_preco"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      atas_registro_preco: {
+        Row: {
+          ativo: boolean | null
+          base_legal: string | null
+          created_at: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          destaque_home: boolean | null
+          fornecedor_cnpj: string
+          fornecedor_nome: string
+          id: string
+          modalidade: string
+          numero_ata: string
+          numero_planejamento: string | null
+          objeto: string | null
+          orgao_gerenciador: string
+          orgao_gerenciador_sigla: string | null
+          pdf_ata_nome: string | null
+          pdf_ata_url: string | null
+          pdf_termo_nome: string | null
+          pdf_termo_url: string | null
+          slug: string
+          status: string
+          updated_at: string | null
+          vigencia_meses: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          base_legal?: string | null
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          destaque_home?: boolean | null
+          fornecedor_cnpj?: string
+          fornecedor_nome?: string
+          id?: string
+          modalidade?: string
+          numero_ata: string
+          numero_planejamento?: string | null
+          objeto?: string | null
+          orgao_gerenciador: string
+          orgao_gerenciador_sigla?: string | null
+          pdf_ata_nome?: string | null
+          pdf_ata_url?: string | null
+          pdf_termo_nome?: string | null
+          pdf_termo_url?: string | null
+          slug: string
+          status?: string
+          updated_at?: string | null
+          vigencia_meses?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          base_legal?: string | null
+          created_at?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          destaque_home?: boolean | null
+          fornecedor_cnpj?: string
+          fornecedor_nome?: string
+          id?: string
+          modalidade?: string
+          numero_ata?: string
+          numero_planejamento?: string | null
+          objeto?: string | null
+          orgao_gerenciador?: string
+          orgao_gerenciador_sigla?: string | null
+          pdf_ata_nome?: string | null
+          pdf_ata_url?: string | null
+          pdf_termo_nome?: string | null
+          pdf_termo_url?: string | null
+          slug?: string
+          status?: string
+          updated_at?: string | null
+          vigencia_meses?: number | null
+        }
+        Relationships: []
+      }
       candidaturas: {
         Row: {
           cenario_atual: string

@@ -84,12 +84,12 @@ export default function Header() {
     .slice(0, 2);
 
   const navLinks = [
-    { href: "#sobre", label: "Sobre", title: "Conheça o Grupo Alfa Tecnologia" },
-    { href: "#servicos", label: "Serviços", title: "Serviços de Fibra Óptica, CFTV e Cabeamento Estruturado" },
-    { href: "#portfolio", label: "Portfólio", title: "Projetos executados em órgãos públicos" },
-    { href: "#ata", label: "Ata de Preço", title: "Ata de Registro de Preço para contratação direta" },
-    { href: "#diferenciais", label: "Diferenciais", title: "Por que escolher o Grupo Alfa" },
-    { href: "#contato", label: "Contato", title: "Entre em contato conosco" },
+    { href: "/#sobre", label: "Sobre", title: "Conheça o Grupo Alfa Tecnologia" },
+    { href: "/#servicos", label: "Serviços", title: "Serviços de Fibra Óptica, CFTV e Cabeamento Estruturado" },
+    { href: "/#portfolio", label: "Portfólio", title: "Projetos executados em órgãos públicos" },
+    { href: "/ata-registro-preco", label: "Ata de Preço", title: "Ata de Registro de Preço para contratação direta" },
+    { href: "/#diferenciais", label: "Diferenciais", title: "Por que escolher o Grupo Alfa" },
+    { href: "/#contato", label: "Contato", title: "Entre em contato conosco" },
   ];
 
   return (
@@ -103,8 +103,8 @@ export default function Header() {
       <div className="container mx-auto px-4 lg:px-8">
         <nav className="flex items-center justify-between" aria-label="Navegação principal">
           {/* Logo */}
-          <a
-            href="#"
+          <Link
+            href="/"
             className="flex items-center group"
             aria-label="Grupo Alfa Tecnologia - Voltar ao início"
             title="Grupo Alfa Tecnologia - Ata de Registro de Preço"
@@ -117,27 +117,27 @@ export default function Header() {
               height={80}
               loading="eager"
             />
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8" role="navigation">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 title={link.title}
                 className="text-white/90 hover:text-[#b6c72c] transition-colors text-sm font-medium relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-[#b6c72c] after:transition-all hover:after:w-full"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
-            <a
-              href="#contato"
+            <Link
+              href="/#contato"
               className="bg-[#b6c72c] text-[#211915] px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-[#9eb025] transition-all hover:shadow-lg hover:shadow-[#b6c72c]/20"
               title="Solicite um orçamento para serviços via Ata de Registro de Preço"
             >
               Solicitar Contato
-            </a>
+            </Link>
 
             {/* Auth Section */}
             {!loading && (
@@ -297,22 +297,22 @@ export default function Header() {
         >
           <div className="bg-[#211915]/95 backdrop-blur-md rounded-2xl p-4 flex flex-col gap-2">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-white/90 hover:text-[#b6c72c] transition-colors py-3 px-4 rounded-lg hover:bg-white/5"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
-            <a
-              href="#contato"
+            <Link
+              href="/#contato"
               onClick={() => setIsMobileMenuOpen(false)}
               className="bg-[#b6c72c] text-[#211915] px-6 py-3 rounded-full font-semibold text-center hover:bg-[#9eb025] transition-colors mt-2"
             >
               Solicitar Contato
-            </a>
+            </Link>
 
             {/* Mobile Login Link */}
             {!loading && !user && (

@@ -11,7 +11,8 @@ import {
   Package,
   Briefcase,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ScrollText
 } from "lucide-react"
 import { useState } from "react"
 
@@ -24,6 +25,11 @@ const menuItems = [
     title: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Atas de Preço",
+    href: "/admin/atas",
+    icon: ScrollText,
   },
   {
     title: "Termos de Referência",
