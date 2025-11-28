@@ -3,7 +3,9 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,21 +14,41 @@ import { LogIn, Mail, Lock, AlertCircle } from "lucide-react"
 import { login } from "./actions"
 import { useOrganizationSettings } from "@/lib/hooks/useOrganizationSettings"
 
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email é obrigatório")
+    .email("Email inválido"),
+  password: z
+    .string()
+    .min(1, "Senha é obrigatória"),
+})
+
+type LoginFormData = z.infer<typeof loginSchema>
+
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
   const { settings } = useOrganizationSettings()
 
-  async function handleSubmit(formData: FormData) {
-    setLoading(true)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  })
+
+  async function onSubmit(data: LoginFormData) {
     setError(null)
+    
+    const formData = new FormData()
+    formData.append("email", data.email)
+    formData.append("password", data.password)
     
     const result = await login(formData)
     
     if (result?.error) {
       setError(result.error)
-      setLoading(false)
     }
   }
 
@@ -99,7 +121,7 @@ export default function LoginPage() {
             </CardHeader>
             
             <CardContent>
-              <form action={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
                     <AlertCircle className="h-4 w-4" />
@@ -113,13 +135,21 @@ export default function LoginPage() {
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cinza-escuro" />
                     <Input
                       id="email"
-                      name="email"
                       type="email"
                       placeholder="seu@email.com"
-                      required
-                      className="pl-10 h-11 border-cinza-medio focus:border-verde"
+                      className={`pl-10 h-11 border-cinza-medio focus:border-verde ${
+                        errors.email ? "border-red-500 focus:border-red-500" : ""
+                      }`}
+                      aria-invalid={errors.email ? "true" : "false"}
+                      {...register("email")}
                     />
                   </div>
+                  {errors.email && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -128,21 +158,29 @@ export default function LoginPage() {
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cinza-escuro" />
                     <Input
                       id="password"
-                      name="password"
                       type="password"
                       placeholder="••••••••"
-                      required
-                      className="pl-10 h-11 border-cinza-medio focus:border-verde"
+                      className={`pl-10 h-11 border-cinza-medio focus:border-verde ${
+                        errors.password ? "border-red-500 focus:border-red-500" : ""
+                      }`}
+                      aria-invalid={errors.password ? "true" : "false"}
+                      {...register("password")}
                     />
                   </div>
+                  {errors.password && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.password.message}
+                    </p>
+                  )}
                 </div>
 
                 <Button 
                   type="submit" 
                   className="w-full h-11 text-base font-semibold"
-                  disabled={loading}
+                  disabled={isSubmitting}
                 >
-                  {loading ? (
+                  {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
