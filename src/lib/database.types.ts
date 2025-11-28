@@ -425,11 +425,36 @@ export type Database = {
           },
         ]
       }
+      permissions: {
+        Row: {
+          id: string
+          resource: string
+          action: string
+          name: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          resource: string
+          action: string
+          name: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          resource?: string
+          action?: string
+          name?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           full_name: string | null
           id: string
+          is_super_admin: boolean | null
           updated_at: string | null
           username: string | null
         }
@@ -437,6 +462,7 @@ export type Database = {
           avatar_url?: string | null
           full_name?: string | null
           id: string
+          is_super_admin?: boolean | null
           updated_at?: string | null
           username?: string | null
         }
@@ -444,10 +470,101 @@ export type Database = {
           avatar_url?: string | null
           full_name?: string | null
           id?: string
+          is_super_admin?: boolean | null
           updated_at?: string | null
           username?: string | null
         }
         Relationships: []
+      }
+      roles: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          role_id: string
+          permission_id: string
+          created_at: string | null
+        }
+        Insert: {
+          role_id: string
+          permission_id: string
+          created_at?: string | null
+        }
+        Update: {
+          role_id?: string
+          permission_id?: string
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          user_id: string
+          role_id: string
+          created_at: string | null
+        }
+        Insert: {
+          user_id: string
+          role_id: string
+          created_at?: string | null
+        }
+        Update: {
+          user_id?: string
+          role_id?: string
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       termo_grupos: {
         Row: {

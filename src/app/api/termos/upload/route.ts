@@ -10,12 +10,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { parsePDF } from '@/lib/services/termos'
+import { checkApiPermission } from '@/lib/permissions/middleware'
 
 export async function POST(request: NextRequest) {
   try {
+    // Verificar permissão para criar termos
+    const { authorized, userId, error: permError } = await checkApiPermission(request, 'termos', 'create')
+    if (!authorized) {
+      return permError!
+    }
+    
     const supabase = await createClient()
     
-    // Verificar autenticação
+    // Obter dados do usuário para o user_id
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json(

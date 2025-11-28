@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { checkApiPermission } from '@/lib/permissions/middleware'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -14,17 +15,14 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    // Verificar permissão para visualizar termos
+    const { authorized, error: permError } = await checkApiPermission(request, 'termos', 'view')
+    if (!authorized) {
+      return permError!
+    }
+    
     const { id } = await params
     const supabase = await createClient()
-    
-    // Verificar autenticação
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      )
-    }
     
     // Buscar termo
     const { data: termo, error: termoError } = await supabase
@@ -86,17 +84,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    // Verificar permissão para deletar termos
+    const { authorized, userId, error: permError } = await checkApiPermission(request, 'termos', 'delete')
+    if (!authorized) {
+      return permError!
+    }
+    
     const { id } = await params
     const supabase = await createClient()
-    
-    // Verificar autenticação
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      )
-    }
     
     // Verificar se o termo existe e pertence ao usuário
     const { data: termo, error: termoError } = await supabase
@@ -112,11 +107,18 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       )
     }
     
-    if (termo.user_id !== user.id) {
-      return NextResponse.json(
-        { error: 'Não autorizado a excluir este termo' },
-        { status: 403 }
-      )
+    // Verificar se o usuário é dono do termo ou tem permissão de manage
+    // Usuários com permissão de delete só podem deletar seus próprios termos
+    // Super admins e usuários com manage podem deletar qualquer termo
+    if (termo.user_id !== userId) {
+      // Verificar se tem permissão de manage (pode deletar de qualquer um)
+      const { authorized: canManage } = await checkApiPermission(request, 'termos', 'manage')
+      if (!canManage) {
+        return NextResponse.json(
+          { error: 'Não autorizado a excluir este termo' },
+          { status: 403 }
+        )
+      }
     }
     
     // Remover arquivo do Storage (se existir)

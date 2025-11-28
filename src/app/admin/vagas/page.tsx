@@ -39,6 +39,8 @@ import {
   XCircle,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { PermissionGate } from "@/components/admin/PermissionGate"
+import type { DbPermission } from "@/lib/permissions/constants"
 
 interface Vaga {
   id: string
@@ -74,6 +76,10 @@ export default function VagasPage() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [editingVaga, setEditingVaga] = useState<Partial<Vaga> | null>(null)
+  const [userPermissions, setUserPermissions] = useState<DbPermission[]>([])
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [permissionsLoading, setPermissionsLoading] = useState(true)
 
   const fetchVagas = useCallback(async () => {
     setLoading(true)
@@ -120,14 +126,95 @@ export default function VagasPage() {
     }
   }, [supabase, tipoFilter, statusFilter])
 
+  // Buscar permissões do usuário
+  useEffect(() => {
+    async function loadPermissions() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        setUserId(user.id)
+
+        // Verificar se é super admin
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_super_admin')
+          .eq('id', user.id)
+          .single()
+
+        if (profile?.is_super_admin) {
+          setIsSuperAdmin(true)
+          // Super admin tem todas as permissões
+          const { data: allPermissions } = await supabase
+            .from('permissions')
+            .select('*')
+          setUserPermissions((allPermissions || []) as DbPermission[])
+        } else {
+          // Buscar permissões através dos papéis
+          const { data } = await supabase
+            .from('user_roles')
+            .select(`
+              roles!inner(
+                role_permissions(
+                  permissions(*)
+                )
+              )
+            `)
+            .eq('user_id', user.id)
+
+          if (data) {
+            const permissionsSet = new Map<string, DbPermission>()
+            for (const userRole of data) {
+              const roles = userRole.roles as { role_permissions: { permissions: DbPermission }[] }
+              for (const rp of roles.role_permissions) {
+                const perm = rp.permissions
+                if (perm && !permissionsSet.has(perm.id)) {
+                  permissionsSet.set(perm.id, perm)
+                }
+              }
+            }
+            setUserPermissions(Array.from(permissionsSet.values()))
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar permissões:', error)
+      } finally {
+        setPermissionsLoading(false)
+      }
+    }
+
+    loadPermissions()
+  }, [supabase])
+
   useEffect(() => {
     fetchVagas()
   }, [fetchVagas])
+
+  // Função auxiliar para verificar permissão
+  const hasPermission = (resource: string, action: string): boolean => {
+    if (isSuperAdmin) return true
+    return userPermissions.some(p => p.resource === resource && p.action === action)
+  }
 
   const handleSave = async () => {
     if (!editingVaga?.titulo || !editingVaga?.tipo_contrato) {
       alert("Título e tipo de contrato são obrigatórios")
       return
+    }
+
+    // Verificar permissões
+    if (editingVaga.id) {
+      // Atualizar - precisa de permissão edit ou manage
+      if (!hasPermission('vagas', 'edit') && !hasPermission('vagas', 'manage')) {
+        alert("Você não tem permissão para editar vagas")
+        return
+      }
+    } else {
+      // Criar - precisa de permissão create ou manage
+      if (!hasPermission('vagas', 'create') && !hasPermission('vagas', 'manage')) {
+        alert("Você não tem permissão para criar vagas")
+        return
+      }
     }
 
     setSaving(true)
@@ -169,6 +256,12 @@ export default function VagasPage() {
   }
 
   const handleDelete = async (id: string) => {
+    // Verificar permissão
+    if (!hasPermission('vagas', 'delete') && !hasPermission('vagas', 'manage')) {
+      alert("Você não tem permissão para excluir vagas")
+      return
+    }
+
     setDeleting(true)
     try {
       const { error } = await supabase.from("vagas").delete().eq("id", id)
@@ -186,6 +279,12 @@ export default function VagasPage() {
   }
 
   const toggleAtivo = async (vaga: Vaga) => {
+    // Verificar permissão para editar
+    if (!hasPermission('vagas', 'edit') && !hasPermission('vagas', 'manage')) {
+      alert("Você não tem permissão para editar vagas")
+      return
+    }
+
     try {
       const { error } = await supabase
         .from("vagas")
@@ -234,10 +333,18 @@ export default function VagasPage() {
             Gerencie as vagas de emprego e visualize candidaturas
           </p>
         </div>
-        <Button onClick={() => openEdit()} className="bg-verde hover:bg-verde/90 text-preto">
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Vaga
-        </Button>
+        {userId && (
+          <PermissionGate 
+            resource="vagas" 
+            action="create" 
+            userId={userId}
+          >
+            <Button onClick={() => openEdit()} className="bg-verde hover:bg-verde/90 text-preto">
+              <Plus className="h-4 w-4 mr-2" />
+              Nova Vaga
+            </Button>
+          </PermissionGate>
+        )}
       </div>
 
       {/* Stats Cards */}
@@ -400,23 +507,66 @@ export default function VagasPage() {
                         </Link>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={vaga.ativo ? "success" : "secondary"}
-                          className="cursor-pointer"
-                          onClick={() => toggleAtivo(vaga)}
-                        >
-                          {vaga.ativo ? (
-                            <>
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Ativa
-                            </>
-                          ) : (
-                            <>
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Inativa
-                            </>
-                          )}
-                        </Badge>
+                        {userId && (
+                          <PermissionGate 
+                            resource="vagas" 
+                            action="edit" 
+                            userId={userId}
+                            fallback={
+                              <Badge
+                                variant={vaga.ativo ? "success" : "secondary"}
+                                className="cursor-not-allowed opacity-50"
+                              >
+                                {vaga.ativo ? (
+                                  <>
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Ativa
+                                  </>
+                                ) : (
+                                  <>
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    Inativa
+                                  </>
+                                )}
+                              </Badge>
+                            }
+                          >
+                            <Badge
+                              variant={vaga.ativo ? "success" : "secondary"}
+                              className="cursor-pointer"
+                              onClick={() => toggleAtivo(vaga)}
+                            >
+                              {vaga.ativo ? (
+                                <>
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Ativa
+                                </>
+                              ) : (
+                                <>
+                                  <XCircle className="h-3 w-3 mr-1" />
+                                  Inativa
+                                </>
+                              )}
+                            </Badge>
+                          </PermissionGate>
+                        )}
+                        {!userId && (
+                          <Badge
+                            variant={vaga.ativo ? "success" : "secondary"}
+                          >
+                            {vaga.ativo ? (
+                              <>
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Ativa
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Inativa
+                              </>
+                            )}
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
@@ -429,23 +579,39 @@ export default function VagasPage() {
                               <Eye className="h-4 w-4" />
                             </Button>
                           </Link>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => openEdit(vaga)}
-                            title="Editar"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => setDeleteConfirm(vaga.id)}
-                            title="Excluir"
-                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {userId && (
+                            <>
+                              <PermissionGate 
+                                resource="vagas" 
+                                action="edit" 
+                                userId={userId}
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  onClick={() => openEdit(vaga)}
+                                  title="Editar"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </PermissionGate>
+                              <PermissionGate 
+                                resource="vagas" 
+                                action="delete" 
+                                userId={userId}
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  onClick={() => setDeleteConfirm(vaga.id)}
+                                  title="Excluir"
+                                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </PermissionGate>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>

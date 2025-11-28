@@ -12,6 +12,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { parseAtaPDF, gerarSlugAta } from '@/lib/services/atas';
+import { checkApiPermission } from '@/lib/permissions/middleware';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/database.types';
 
@@ -338,6 +339,15 @@ async function processarUpload(
 }
 
 export async function POST(request: NextRequest) {
+    // Verificar permissão para criar atas
+    const { authorized, userId, error } = await checkApiPermission(request, 'atas', 'create')
+    if (!authorized) {
+        return new Response(
+            JSON.stringify({ error: 'Sem permissão para criar atas' }),
+            { status: 403, headers: { 'Content-Type': 'application/json' } }
+        );
+    }
+
     // Criar cliente Supabase ANTES do stream (para ter acesso aos cookies)
     const supabase = await createClient();
 
