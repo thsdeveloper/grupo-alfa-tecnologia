@@ -148,7 +148,7 @@ export async function getUserRoles(userId: string): Promise<Role[]> {
     return []
   }
   
-  return data.map((ur: { roles: Role }) => ur.roles)
+  return data.map((ur) => ur.roles as Role)
 }
 
 /**
@@ -193,7 +193,7 @@ export async function getRoleWithPermissions(roleId: string): Promise<RoleWithPe
     `)
     .eq('role_id', roleId)
   
-  const permissions = rolePermissions?.map((rp: { permissions: DbPermission }) => rp.permissions) || []
+  const permissions = rolePermissions?.map((rp) => rp.permissions as DbPermission) || []
   
   return {
     ...role,

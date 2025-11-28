@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useOrganizationSettings } from "@/lib/hooks/useOrganizationSettings";
 
 export default function FloatingWhatsApp() {
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const { settings } = useOrganizationSettings();
 
   useEffect(() => {
     // Mostra o botão após um pequeno delay para uma entrada suave
@@ -12,8 +14,9 @@ export default function FloatingWhatsApp() {
     return () => clearTimeout(timer);
   }, []);
 
-  const whatsappNumber = "5561986161961";
-  const message = encodeURIComponent("Olá! Gostaria de mais informações sobre os serviços da Grupo Alfa Tecnologia.");
+  const whatsappNumber = settings.whatsapp || "5561986161961";
+  const companyName = settings.company_short_name || "Grupo Alfa Tecnologia";
+  const message = encodeURIComponent(`Olá! Gostaria de mais informações sobre os serviços da ${companyName}.`);
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
 
   return (
@@ -53,4 +56,3 @@ export default function FloatingWhatsApp() {
     </a>
   );
 }
-

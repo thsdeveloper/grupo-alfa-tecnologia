@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      ata_item_imagens: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          id: string
+          item_id: string
+          nome_arquivo: string | null
+          ordem: number | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          item_id: string
+          nome_arquivo?: string | null
+          ordem?: number | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          item_id?: string
+          nome_arquivo?: string | null
+          ordem?: number | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ata_item_imagens_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "ata_itens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ata_itens: {
         Row: {
           ata_id: string
@@ -111,41 +149,6 @@ export type Database = {
             columns: ["ata_id"]
             isOneToOne: false
             referencedRelation: "atas_registro_preco"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ata_item_imagens: {
-        Row: {
-          id: string
-          item_id: string
-          url: string
-          nome_arquivo: string | null
-          ordem: number | null
-          created_at: string | null
-        }
-        Insert: {
-          id?: string
-          item_id: string
-          url: string
-          nome_arquivo?: string | null
-          ordem?: number | null
-          created_at?: string | null
-        }
-        Update: {
-          id?: string
-          item_id?: string
-          url?: string
-          nome_arquivo?: string | null
-          ordem?: number | null
-          created_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ata_item_imagens_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "ata_itens"
             referencedColumns: ["id"]
           },
         ]
@@ -374,6 +377,132 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_settings: {
+        Row: {
+          accent_color: string | null
+          address_city: string | null
+          address_complement: string | null
+          address_neighborhood: string | null
+          address_number: string | null
+          address_state: string | null
+          address_street: string | null
+          address_zipcode: string | null
+          business_hours: string | null
+          cnpj: string
+          company_name: string
+          company_short_name: string
+          company_slogan: string | null
+          created_at: string | null
+          email: string | null
+          favicon_url: string | null
+          id: string
+          logo_dark_url: string | null
+          logo_url: string | null
+          phone: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          seo_description: string | null
+          seo_keywords: string | null
+          seo_title: string | null
+          social_facebook: string | null
+          social_instagram: string | null
+          social_linkedin: string | null
+          social_youtube: string | null
+          updated_at: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          accent_color?: string | null
+          address_city?: string | null
+          address_complement?: string | null
+          address_neighborhood?: string | null
+          address_number?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zipcode?: string | null
+          business_hours?: string | null
+          cnpj?: string
+          company_name?: string
+          company_short_name?: string
+          company_slogan?: string | null
+          created_at?: string | null
+          email?: string | null
+          favicon_url?: string | null
+          id?: string
+          logo_dark_url?: string | null
+          logo_url?: string | null
+          phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          seo_description?: string | null
+          seo_keywords?: string | null
+          seo_title?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_linkedin?: string | null
+          social_youtube?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          accent_color?: string | null
+          address_city?: string | null
+          address_complement?: string | null
+          address_neighborhood?: string | null
+          address_number?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zipcode?: string | null
+          business_hours?: string | null
+          cnpj?: string
+          company_name?: string
+          company_short_name?: string
+          company_slogan?: string | null
+          created_at?: string | null
+          email?: string | null
+          favicon_url?: string | null
+          id?: string
+          logo_dark_url?: string | null
+          logo_url?: string | null
+          phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          seo_description?: string | null
+          seo_keywords?: string | null
+          seo_title?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_linkedin?: string | null
+          social_youtube?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      permissions: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          name: string
+          resource: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          name: string
+          resource: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          resource?: string
+        }
+        Relationships: []
+      }
       process_logs: {
         Row: {
           created_at: string | null
@@ -425,30 +554,6 @@ export type Database = {
           },
         ]
       }
-      permissions: {
-        Row: {
-          id: string
-          resource: string
-          action: string
-          name: string
-          created_at: string | null
-        }
-        Insert: {
-          id?: string
-          resource: string
-          action: string
-          name: string
-          created_at?: string | null
-        }
-        Update: {
-          id?: string
-          resource?: string
-          action?: string
-          name?: string
-          created_at?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -476,54 +581,23 @@ export type Database = {
         }
         Relationships: []
       }
-      roles: {
-        Row: {
-          id: string
-          name: string
-          description: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          name: string
-          description?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          name?: string
-          description?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       role_permissions: {
         Row: {
-          role_id: string
-          permission_id: string
           created_at: string | null
+          permission_id: string
+          role_id: string
         }
         Insert: {
-          role_id: string
-          permission_id: string
           created_at?: string | null
+          permission_id: string
+          role_id: string
         }
         Update: {
-          role_id?: string
-          permission_id?: string
           created_at?: string | null
+          permission_id?: string
+          role_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "role_permissions_role_id_fkey"
-            columns: ["role_id"]
-            isOneToOne: false
-            referencedRelation: "roles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "role_permissions_permission_id_fkey"
             columns: ["permission_id"]
@@ -531,40 +605,38 @@ export type Database = {
             referencedRelation: "permissions"
             referencedColumns: ["id"]
           },
-        ]
-      }
-      user_roles: {
-        Row: {
-          user_id: string
-          role_id: string
-          created_at: string | null
-        }
-        Insert: {
-          user_id: string
-          role_id: string
-          created_at?: string | null
-        }
-        Update: {
-          user_id?: string
-          role_id?: string
-          created_at?: string | null
-        }
-        Relationships: [
           {
-            foreignKeyName: "user_roles_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_roles_role_id_fkey"
+            foreignKeyName: "role_permissions_role_id_fkey"
             columns: ["role_id"]
             isOneToOne: false
             referencedRelation: "roles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       termo_grupos: {
         Row: {
@@ -845,6 +917,39 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          role_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          role_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vagas: {
         Row: {
           ativo: boolean | null
@@ -889,7 +994,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_permissions: {
+        Args: { p_user_id: string }
+        Returns: {
+          action: string
+          name: string
+          resource: string
+        }[]
+      }
+      is_super_admin: { Args: { p_user_id: string }; Returns: boolean }
+      user_has_permission: {
+        Args: { p_action: string; p_resource: string; p_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
@@ -1022,3 +1139,6 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+// Type alias for organization settings
+export type OrganizationSettings = Tables<"organization_settings">

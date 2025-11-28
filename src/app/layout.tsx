@@ -3,6 +3,7 @@ import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import JsonLdSchema from "@/components/JsonLdSchema";
+import DynamicFavicon from "@/components/DynamicFavicon";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -150,7 +151,7 @@ export default function RootLayout({
     <html lang="pt-BR" className="scroll-smooth">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <DynamicFavicon />
         <link
           rel="preconnect"
           href="https://fonts.googleapis.com"

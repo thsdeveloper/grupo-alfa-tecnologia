@@ -15,10 +15,12 @@ import {
   ScrollText,
   Users,
   Shield,
+  Settings,
   LucideIcon,
 } from "lucide-react"
 import { useState } from "react"
 import type { Resource, Action } from "@/lib/permissions/constants"
+import { useOrganizationSettings } from "@/lib/hooks/useOrganizationSettings"
 
 interface MenuItem {
   title: string
@@ -84,6 +86,16 @@ const adminMenuItems: MenuItem[] = [
   },
 ]
 
+// Itens do menu de organização (somente super admin)
+const organizationMenuItems: MenuItem[] = [
+  {
+    title: "Configurações",
+    href: "/admin/settings",
+    icon: Settings,
+    // Sem permissão definida - será filtrado pelo isSuperAdmin
+  },
+]
+
 const profileMenuItem: MenuItem = {
   title: "Meu Perfil",
   href: "/admin/profile",
@@ -97,6 +109,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const { settings } = useOrganizationSettings()
 
   // Função para verificar se o usuário tem permissão para um item
   const hasPermission = (item: MenuItem): boolean => {
@@ -154,7 +167,7 @@ export function Sidebar({
       )}>
         <Link href="/admin" className="flex items-center">
           <Image
-            src="/logo-alfa-telecon2.png"
+            src={settings.logo_url || "/logo-alfa-telecon2.png"}
             alt="Grupo Alfa Tecnologia"
             width={collapsed ? 50 : 120}
             height={collapsed ? 50 : 120}
@@ -196,6 +209,19 @@ export function Sidebar({
             )}
 
             {visibleAdminItems.map(renderMenuItem)}
+          </div>
+        )}
+
+        {/* Menu de Organização - somente super admin */}
+        {isSuperAdmin && (
+          <div className="mt-6 space-y-1">
+            {!collapsed && (
+              <p className="px-3 mb-2 text-xs font-semibold text-cinza-escuro uppercase tracking-wider">
+                Organização
+              </p>
+            )}
+
+            {organizationMenuItems.map(renderMenuItem)}
           </div>
         )}
 

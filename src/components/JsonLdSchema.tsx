@@ -1,5 +1,9 @@
-export default function JsonLdSchema() {
+import { getOrganizationSettings } from "@/lib/services/organization";
+
+export default async function JsonLdSchema() {
   const siteUrl = "https://www.grupoalfatecnologia.com.br";
+  const settings = await getOrganizationSettings();
+  const logoUrl = settings.logo_url || `${siteUrl}/logo-alfa-telecon2.png`;
 
   // Schema da Organização
   const organizationSchema = {
@@ -11,11 +15,11 @@ export default function JsonLdSchema() {
     url: siteUrl,
     logo: {
       "@type": "ImageObject",
-      url: `${siteUrl}/logo-alfa-telecon2.png`,
+      url: logoUrl,
       width: 300,
       height: 100,
     },
-    image: `${siteUrl}/logo-alfa-telecon2.png`,
+    image: logoUrl,
     description:
       "Empresa especializada em infraestrutura de TI para órgãos públicos com Ata de Registro de Preço vigente. Serviços de fibra óptica, cabeamento estruturado, CFTV e segurança eletrônica.",
     foundingDate: "2018",
@@ -80,7 +84,7 @@ export default function JsonLdSchema() {
     "@type": "LocalBusiness",
     "@id": `${siteUrl}/#localbusiness`,
     name: "Grupo Alfa Tecnologia",
-    image: `${siteUrl}/logo-alfa-telecon2.png`,
+    image: logoUrl,
     telephone: "+55-61-3522-5203",
     email: "comercial@grupoalfatelecom.com.br",
     url: siteUrl,

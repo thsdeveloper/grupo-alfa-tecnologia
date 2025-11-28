@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut, LayoutDashboard, LogIn } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { useOrganizationSettings } from "@/lib/hooks/useOrganizationSettings";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,6 +22,7 @@ export default function Header() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<{ full_name: string | null; avatar_url: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
+  const { settings } = useOrganizationSettings();
 
   const supabase = createClient();
 
@@ -84,11 +86,11 @@ export default function Header() {
     .slice(0, 2);
 
   const navLinks = [
-    { href: "/#sobre", label: "Sobre", title: "Conheça o Grupo Alfa Tecnologia" },
+    { href: "/#sobre", label: "Sobre", title: `Conheça o ${settings.company_short_name}` },
     { href: "/#servicos", label: "Serviços", title: "Serviços de Fibra Óptica, CFTV e Cabeamento Estruturado" },
     { href: "/#portfolio", label: "Portfólio", title: "Projetos executados em órgãos públicos" },
     { href: "/ata-registro-preco", label: "Ata de Preço", title: "Ata de Registro de Preço para contratação direta" },
-    { href: "/#diferenciais", label: "Diferenciais", title: "Por que escolher o Grupo Alfa" },
+    { href: "/#diferenciais", label: "Diferenciais", title: `Por que escolher o ${settings.company_short_name}` },
     { href: "/#contato", label: "Contato", title: "Entre em contato conosco" },
   ];
 
@@ -106,12 +108,12 @@ export default function Header() {
           <Link
             href="/"
             className="flex items-center group"
-            aria-label="Grupo Alfa Tecnologia - Voltar ao início"
-            title="Grupo Alfa Tecnologia - Ata de Registro de Preço"
+            aria-label={`${settings.company_short_name} - Voltar ao início`}
+            title={`${settings.company_short_name} - Ata de Registro de Preço`}
           >
             <img
-              src="/logo-alfa-telecon2.png"
-              alt="Logo Grupo Alfa Tecnologia - Empresa de Infraestrutura de TI com Ata de Registro de Preço para Órgãos Públicos"
+              src={settings.logo_url || "/logo-alfa-telecon2.png"}
+              alt={`Logo ${settings.company_short_name} - Empresa de Infraestrutura de TI com Ata de Registro de Preço para Órgãos Públicos`}
               className="h-20 w-auto transition-transform group-hover:scale-105"
               width={200}
               height={80}

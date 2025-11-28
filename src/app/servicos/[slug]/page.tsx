@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { servicos, getServicoBySlug, getAllServicosSlug } from "@/data/servicos";
 import Footer from "@/components/Footer";
+import { getOrganizationSettings } from "@/lib/services/organization";
 
 const siteUrl = "https://www.grupoalfatecnologia.com.br";
 
@@ -146,6 +147,7 @@ export default async function ServicoPage({
 }) {
   const { slug } = await params;
   const servico = getServicoBySlug(slug);
+  const settings = await getOrganizationSettings();
 
   if (!servico) {
     notFound();
@@ -171,7 +173,7 @@ export default async function ServicoPage({
               aria-label="Voltar para página inicial"
             >
               <img
-                src="/logo-alfa-telecon2.png"
+                src={settings.logo_url || "/logo-alfa-telecon2.png"}
                 alt="Logo Grupo Alfa Tecnologia - Empresa de Infraestrutura de TI"
                 className="h-16 md:h-20 w-auto transition-transform group-hover:scale-105"
                 width={200}

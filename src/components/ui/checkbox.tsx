@@ -27,7 +27,7 @@ const Checkbox = React.forwardRef<
 
   React.useEffect(() => {
     if (internalRef.current) {
-      const element = internalRef.current as unknown as HTMLButtonElement
+      const element = internalRef.current as unknown as HTMLInputElement
       if (indeterminate !== undefined) {
         element.indeterminate = indeterminate
       }

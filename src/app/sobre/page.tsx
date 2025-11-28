@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Footer from "@/components/Footer";
+import { getOrganizationSettings } from "@/lib/services/organization";
 
 const siteUrl = "https://www.grupoalfatecnologia.com.br";
 
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 // JSON-LD Schema para a página Sobre
-function AboutJsonLd() {
+function AboutJsonLd({ settings }: { settings: Awaited<ReturnType<typeof getOrganizationSettings>> }) {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -40,7 +41,7 @@ function AboutJsonLd() {
     name: "Grupo Alfa Tecnologia",
     legalName: "Grupo Alfa Tecnologia LTDA",
     url: siteUrl,
-    logo: `${siteUrl}/logo-alfa-telecon2.png`,
+    logo: settings.logo_url || `${siteUrl}/logo-alfa-telecon2.png`,
     foundingDate: "2018",
     founders: [
       {
@@ -77,7 +78,8 @@ function AboutJsonLd() {
   );
 }
 
-export default function SobrePage() {
+export default async function SobrePage() {
+  const settings = await getOrganizationSettings();
   const stats = [
     { number: "20+", label: "Anos de Experiência", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
     { number: "8+", label: "Anos no Setor Público", icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" },
@@ -161,7 +163,7 @@ export default function SobrePage() {
 
   return (
     <>
-      <AboutJsonLd />
+      <AboutJsonLd settings={settings} />
 
       {/* Header */}
       <header className="bg-[#211915] py-4 sticky top-0 z-50">
@@ -176,7 +178,7 @@ export default function SobrePage() {
               aria-label="Voltar para página inicial"
             >
               <img
-                src="/logo-alfa-telecon2.png"
+                src={settings.logo_url || "/logo-alfa-telecon2.png"}
                 alt="Logo Grupo Alfa Tecnologia"
                 className="h-16 md:h-20 w-auto transition-transform group-hover:scale-105"
                 width={200}

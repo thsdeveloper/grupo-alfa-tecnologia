@@ -9,12 +9,14 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { UserPlus, Mail, Lock, User, AlertCircle, CheckCircle2, Info } from "lucide-react"
 import { signup } from "./actions"
+import { useOrganizationSettings } from "@/lib/hooks/useOrganizationSettings"
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [warning, setWarning] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const { settings } = useOrganizationSettings()
 
   async function handleSubmit(formData: FormData) {
     setLoading(true)
@@ -62,7 +64,7 @@ export default function RegisterPage() {
         <div className="relative z-10 flex flex-col justify-center items-center w-full p-12">
           <div className="mb-8">
             <Image
-              src="/logo-alfa-telecon2.png"
+              src={settings.logo_url || "/logo-alfa-telecon2.png"}
               alt="Grupo Alfa Tecnologia"
               width={180}
               height={180}
@@ -107,7 +109,7 @@ export default function RegisterPage() {
           {/* Mobile Logo */}
           <div className="lg:hidden flex justify-center mb-8">
             <Image
-              src="/logo-alfa-telecon2.png"
+              src={settings.logo_url || "/logo-alfa-telecon2.png"}
               alt="Grupo Alfa Tecnologia"
               width={100}
               height={100}

@@ -6,6 +6,7 @@ import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import { servicos } from "@/data/servicos";
 import dynamic from "next/dynamic";
+import { useOrganizationSettings } from "@/lib/hooks/useOrganizationSettings";
 
 // Importar Leaflet dinamicamente para evitar problemas de SSR
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false });
@@ -124,6 +125,7 @@ export default function AtaApresentacao({
   const itens = propItens && propItens.length > 0 ? propItens : defaultItens;
   const lotes = propLotes && propLotes.length > 0 ? propLotes : defaultLotes;
   const imagens = propImagens || [];
+  const { settings } = useOrganizationSettings();
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -274,7 +276,7 @@ export default function AtaApresentacao({
         <div className="mb-8 relative">
           <div className="absolute inset-0 bg-[#b6c72c]/20 blur-3xl rounded-full scale-150" />
           <img
-            src="/logo-alfa-telecon2.png"
+            src={settings.logo_url || "/logo-alfa-telecon2.png"}
             alt="Grupo Alfa Tecnologia"
             className="h-40 md:h-52 lg:h-64 w-auto relative z-10 drop-shadow-2xl"
           />
@@ -343,7 +345,7 @@ export default function AtaApresentacao({
 
         <div className="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
           <div className="text-center mb-8">
-            <img src="/logo-alfa-telecon2.png" alt="Alfa Tecnologia" className="h-16 mx-auto mb-4" />
+            <img src={settings.logo_url || "/logo-alfa-telecon2.png"} alt="Alfa Tecnologia" className="h-16 mx-auto mb-4" />
             <p className="text-white font-bold text-xl">Dados Cadastrais</p>
           </div>
 
@@ -550,7 +552,7 @@ export default function AtaApresentacao({
         {/* Logo pequena */}
         <div className="mb-8">
           <img
-            src="/logo-alfa-telecon2.png"
+            src={settings.logo_url || "/logo-alfa-telecon2.png"}
             alt="Logo Grupo Alfa Tecnologia"
             className="h-16 md:h-20 w-auto mx-auto drop-shadow-xl opacity-80"
           />
@@ -982,7 +984,7 @@ export default function AtaApresentacao({
       <div className="relative z-10 max-w-4xl w-full">
         <div className="mb-10">
           <img
-            src="/logo-alfa-telecon2.png"
+            src={settings.logo_url || "/logo-alfa-telecon2.png"}
             alt="Logo Grupo Alfa Tecnologia"
             className="h-24 md:h-32 w-auto mx-auto mb-8 drop-shadow-2xl"
           />

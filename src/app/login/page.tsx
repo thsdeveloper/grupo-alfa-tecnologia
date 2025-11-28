@@ -10,11 +10,13 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { LogIn, Mail, Lock, AlertCircle } from "lucide-react"
 import { login } from "./actions"
+import { useOrganizationSettings } from "@/lib/hooks/useOrganizationSettings"
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { settings } = useOrganizationSettings()
 
   async function handleSubmit(formData: FormData) {
     setLoading(true)
@@ -38,7 +40,7 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-center items-center w-full p-12">
           <div className="mb-8">
             <Image
-              src="/logo-alfa-telecon2.png"
+              src={settings.logo_url || "/logo-alfa-telecon2.png"}
               alt="Grupo Alfa Tecnologia"
               width={180}
               height={180}
@@ -77,7 +79,7 @@ export default function LoginPage() {
           {/* Mobile Logo */}
           <div className="lg:hidden flex justify-center mb-8">
             <Image
-              src="/logo-alfa-telecon2.png"
+              src={settings.logo_url || "/logo-alfa-telecon2.png"}
               alt="Grupo Alfa Tecnologia"
               width={100}
               height={100}
