@@ -177,22 +177,56 @@ export default function AtaApresentacao({
     });
   }, [leafletModule]);
 
-  // Dividir itens em grupos para slides
+  // Função para gerar descrição de como podemos ajudar baseada no tipo de item
+  const gerarDescricaoAjuda = (item: Item): string => {
+    const descLower = item.descricao.toLowerCase();
+    
+    if (descLower.includes('ponto de rede') || descLower.includes('cat.6') || descLower.includes('cat6') || descLower.includes('cat5e')) {
+      return "Oferecemos instalação completa de pontos de rede estruturada, incluindo fornecimento e instalação de todos os materiais necessários. Nossa equipe técnica certificada garante instalações de alta qualidade, seguindo rigorosamente as normas técnicas vigentes. Realizamos testes de certificação e documentação completa do projeto.";
+    }
+    
+    if (descLower.includes('eletroduto') || descLower.includes('seal tube')) {
+      return "Executamos a instalação de eletrodutos com precisão e qualidade, garantindo a proteção adequada dos cabos. Utilizamos materiais de primeira linha e seguimos todas as normas técnicas de instalação. Nossa experiência em projetos públicos garante execuções rápidas e eficientes.";
+    }
+    
+    if (descLower.includes('eletrocalha') || descLower.includes('canaleta')) {
+      return "Instalamos eletrocalhas e canaletas metálicas com expertise técnica, garantindo organização e proteção da infraestrutura de cabos. Oferecemos soluções personalizadas conforme as necessidades do projeto, com materiais de alta qualidade e instalação profissional.";
+    }
+    
+    if (descLower.includes('cabo utp') || descLower.includes('cabo cat')) {
+      return "Fornecemos e instalamos cabos de rede de alta qualidade, seguindo as especificações técnicas mais rigorosas. Realizamos a instalação com cuidado e precisão, garantindo desempenho otimizado da rede. Nossa equipe está preparada para projetos de qualquer escala.";
+    }
+    
+    if (descLower.includes('fibra óptica') || descLower.includes('óptico')) {
+      return "Somos especialistas em instalação de infraestrutura de fibra óptica. Oferecemos serviços completos desde a instalação até a fusão e certificação, garantindo enlaces de alta qualidade. Nossa experiência em projetos governamentais assegura execuções dentro dos prazos e especificações técnicas.";
+    }
+    
+    if (descLower.includes('cftv') || descLower.includes('câmera')) {
+      return "Instalamos sistemas de CFTV completos, incluindo câmeras, cabeamento e infraestrutura necessária. Nossa equipe técnica garante instalações profissionais que atendem às necessidades de segurança e monitoramento. Oferecemos suporte técnico e documentação completa do projeto.";
+    }
+    
+    if (descLower.includes('controle de acesso')) {
+      return "Implementamos sistemas completos de controle de acesso, incluindo toda a infraestrutura necessária. Nossa experiência em projetos públicos garante soluções seguras e confiáveis, com instalação profissional e suporte técnico especializado.";
+    }
+    
+    // Descrição genérica para outros tipos de item
+    return "Oferecemos execução completa deste serviço com equipe técnica especializada e materiais de alta qualidade. Nossa experiência em projetos públicos garante execuções dentro dos prazos estabelecidos, seguindo rigorosamente as especificações técnicas e normas vigentes. Fornecemos documentação completa e suporte técnico durante todo o projeto.";
+  };
+
+  // Filtrar itens executáveis
+  const itensExecutaveis = itens.filter(item => item.executavel === true);
+  
+  // Dividir itens em grupos para slides (mantendo para slides de catálogo)
   const itemGroups: Item[][] = [];
   for (let i = 0; i < itens.length; i += 5) {
     itemGroups.push(itens.slice(i, i + 5));
   }
 
-  // Dividir imagens em grupos para slides (6 imagens por slide)
-  const imagemGroups: ItemImagem[][] = [];
-  for (let i = 0; i < imagens.length; i += 6) {
-    imagemGroups.push(imagens.slice(i, i + 6));
-  }
-
   // Calcular número base de slides (sem itens e imagens dinâmicos)
   // Slides base: capa-institucional, empresa, diferenciais, servicos, abrangencia, capa-ata, partes, objeto, vigencia, adesao, contato = 11
   const baseSlides = 11;
-  const totalSlides = baseSlides + itemGroups.length + imagemGroups.length;
+  // Adicionar slides de itens executáveis individuais + slides de catálogo de itens
+  const totalSlides = baseSlides + itemGroups.length + itensExecutaveis.length;
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
@@ -810,52 +844,90 @@ export default function AtaApresentacao({
       </div>
     </div>,
 
-    // Slides de Galeria de Fotos dos Serviços
-    ...imagemGroups.map((grupo, groupIndex) => (
-      <div key={`galeria-${groupIndex}`} className="flex flex-col h-full p-6 lg:p-12 bg-[#1a1411]">
-        <div className="text-center mb-8">
-          <span className="text-[#b6c72c] font-bold text-sm uppercase tracking-wider mb-2 block">Portfolio Visual</span>
-          <h2 className="text-3xl md:text-5xl font-bold text-white font-heading">
-            Galeria de <span className="text-[#b6c72c]">Serviços</span>
-            {imagemGroups.length > 1 && (
-              <span className="text-white/30 text-xl font-light ml-3">({groupIndex + 1}/{imagemGroups.length})</span>
-            )}
-          </h2>
-        </div>
+    // Slides individuais para cada item executável com suas fotos
+    ...itensExecutaveis.map((item) => {
+      const imagensDoItem = imagens.filter(img => img.item_id === item.id);
+      
+      return (
+        <div key={`item-${item.id}`} className="flex flex-col h-full p-6 lg:p-12 bg-gradient-to-br from-[#211915] to-[#1a1411] relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-5" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23b6c72c' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
 
-        <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-6">
-          {grupo.map((img, imgIndex) => {
-            const itemDaImagem = itens.find(i => i.id === img.item_id);
-            return (
-              <div key={img.id} className="relative group rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-xl">
-                <div className="aspect-video relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={img.url}
-                    alt={img.nome_arquivo || `Serviço ${imgIndex + 1}`}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#211915] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                </div>
+          <div className="relative z-10 flex flex-col h-full">
+            {/* Cabeçalho do Item */}
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="bg-[#b6c72c] text-[#211915] text-lg font-bold px-4 py-2 rounded-lg">
+                  ITEM {item.numero_item}
+                </span>
+                <span className="text-white/50 text-sm font-medium">
+                  {item.unidade}
+                </span>
+              </div>
+              <h2 className="text-2xl md:text-4xl font-bold text-white font-heading leading-tight mb-4">
+                {item.descricao}
+              </h2>
+              {item.preco_unitario && (
+                <p className="text-[#b6c72c] text-xl font-bold">
+                  {formatCurrency(item.preco_unitario)} / {item.unidade}
+                </p>
+              )}
+            </div>
 
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#211915] via-[#211915]/90 to-transparent pt-12">
-                  {itemDaImagem && (
-                    <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                      <span className="inline-block bg-[#b6c72c] text-[#211915] text-[10px] font-bold px-2 py-0.5 rounded mb-1">
-                        ITEM {itemDaImagem.numero_item}
-                      </span>
-                      <p className="text-white text-sm font-medium line-clamp-2 leading-snug">
-                        {itemDaImagem.descricao}
-                      </p>
+            {/* Grid de Fotos */}
+            {imagensDoItem.length > 0 ? (
+              <div className="flex-1 min-h-0 mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 h-full overflow-y-auto pr-2">
+                  {imagensDoItem.map((img) => (
+                    <div key={img.id} className="relative group rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg">
+                      <div className="aspect-video relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={img.url}
+                          alt={img.nome_arquivo || `Item ${item.numero_item} - ${item.descricao}`}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#211915]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
-            );
-          })}
+            ) : (
+              <div className="flex-1 flex items-center justify-center mb-6">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                    <svg className="w-12 h-12 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-white/40 text-sm">Nenhuma foto disponível para este item</p>
+                </div>
+              </div>
+            )}
+
+            {/* Descrição de Como Podemos Ajudar */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 mt-auto">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-[#b6c72c]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-[#b6c72c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-[#b6c72c] font-bold text-lg mb-2">Como Podemos Ajudar</h3>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    {gerarDescricaoAjuda(item)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    )),
+      );
+    }),
 
     // Slide - Como Aderir
     <div key="adesao" className="flex flex-col h-full p-6 lg:p-12 bg-gradient-to-br from-[#211915] to-[#1a1411] relative overflow-hidden">
