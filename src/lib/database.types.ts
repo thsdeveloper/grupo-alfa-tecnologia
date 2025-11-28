@@ -20,6 +20,7 @@ export type Database = {
           ativo: boolean | null
           created_at: string | null
           descricao: string
+          executavel: boolean | null
           id: string
           lote_id: string | null
           numero_item: string
@@ -34,6 +35,7 @@ export type Database = {
           ativo?: boolean | null
           created_at?: string | null
           descricao: string
+          executavel?: boolean | null
           id?: string
           lote_id?: string | null
           numero_item: string
@@ -48,6 +50,7 @@ export type Database = {
           ativo?: boolean | null
           created_at?: string | null
           descricao?: string
+          executavel?: boolean | null
           id?: string
           lote_id?: string | null
           numero_item?: string
@@ -108,6 +111,41 @@ export type Database = {
             columns: ["ata_id"]
             isOneToOne: false
             referencedRelation: "atas_registro_preco"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ata_item_imagens: {
+        Row: {
+          id: string
+          item_id: string
+          url: string
+          nome_arquivo: string | null
+          ordem: number | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          url: string
+          nome_arquivo?: string | null
+          ordem?: number | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          url?: string
+          nome_arquivo?: string | null
+          ordem?: number | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ata_item_imagens_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "ata_itens"
             referencedColumns: ["id"]
           },
         ]

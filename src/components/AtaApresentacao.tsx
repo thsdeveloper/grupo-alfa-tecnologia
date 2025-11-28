@@ -33,18 +33,28 @@ interface Ata {
 
 interface Lote {
   id: string;
+  ata_id: string;
   numero: string;
   descricao: string | null;
+  ativo: boolean | null;
+  ordem: number | null;
+  created_at: string | null;
 }
 
 interface Item {
   id: string;
+  ata_id: string;
   lote_id: string | null;
   numero_item: string;
   descricao: string;
   unidade: string;
-  quantidade: number;
-  preco_unitario: number;
+  quantidade: number | null;
+  preco_unitario: number | null;
+  ativo: boolean | null;
+  ordem: number | null;
+  executavel: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 interface ItemImagem {
@@ -52,7 +62,8 @@ interface ItemImagem {
   item_id: string;
   url: string;
   nome_arquivo: string | null;
-  descricao: string | null;
+  ordem: number | null;
+  created_at: string | null;
 }
 
 interface AtaApresentacaoProps {
@@ -82,22 +93,22 @@ const defaultAta: Ata = {
 };
 
 const defaultItens: Item[] = [
-  { id: "1", lote_id: "lote2", numero_item: "23", descricao: "Execução de ponto de rede CAT.6, instalado incluindo fornecimento e instalação de materiais", unidade: "Unidade", quantidade: 66147, preco_unitario: 201.99 },
-  { id: "2", lote_id: "lote2", numero_item: "24", descricao: "Execução de ponto de rede CAT5E, instalado incluindo fornecimento e instalação de materiais", unidade: "Unidade", quantidade: 24892, preco_unitario: 181.84 },
-  { id: "3", lote_id: "lote2", numero_item: "25", descricao: "Eletroduto de ferro galvanizado ou flexível corrugado tipo 'Seal Tube', até 1 polegada", unidade: "Metro Linear", quantidade: 846005, preco_unitario: 19.66 },
-  { id: "4", lote_id: "lote2", numero_item: "26", descricao: "Eletroduto de ferro galvanizado ou flexível corrugado tipo 'Seal Tube', de 1 1/4 até 3 polegadas", unidade: "Metro Linear", quantidade: 235097, preco_unitario: 41.50 },
-  { id: "5", lote_id: "lote2", numero_item: "27", descricao: "Eletrocalha metálica galvanizada de 25mm até 400mm (L) x 25mm até 100mm (H)", unidade: "Metro Linear", quantidade: 186374, preco_unitario: 117.95 },
-  { id: "6", lote_id: "lote2", numero_item: "28", descricao: "Canaleta em material metálico galvanizado/alumínio, tampada e septada", unidade: "Metro Linear", quantidade: 164455, preco_unitario: 129.74 },
-  { id: "7", lote_id: "lote2", numero_item: "29", descricao: "Canaleta de piso em PVC rígido autoextinguível", unidade: "Metro Linear", quantidade: 99040, preco_unitario: 87.15 },
-  { id: "8", lote_id: "lote2", numero_item: "30", descricao: "Cabo UTP CAT6, 4 pares em eletroduto", unidade: "Metro Linear", quantidade: 1408850, preco_unitario: 9.31 },
-  { id: "9", lote_id: "lote2", numero_item: "31", descricao: "Cabo UTP CAT5E, 4 pares em eletroduto", unidade: "Metro Linear", quantidade: 229305, preco_unitario: 8.51 },
-  { id: "10", lote_id: "lote2", numero_item: "32", descricao: "Ponto de rede óptico, 6 fibras, 3 pares", unidade: "Metro Linear", quantidade: 23952, preco_unitario: 20.64 },
+  { id: "1", ata_id: "default", lote_id: "lote2", numero_item: "23", descricao: "Execução de ponto de rede CAT.6, instalado incluindo fornecimento e instalação de materiais", unidade: "Unidade", quantidade: 66147, preco_unitario: 201.99, ativo: true, ordem: 1, executavel: true, created_at: null, updated_at: null },
+  { id: "2", ata_id: "default", lote_id: "lote2", numero_item: "24", descricao: "Execução de ponto de rede CAT5E, instalado incluindo fornecimento e instalação de materiais", unidade: "Unidade", quantidade: 24892, preco_unitario: 181.84, ativo: true, ordem: 2, executavel: true, created_at: null, updated_at: null },
+  { id: "3", ata_id: "default", lote_id: "lote2", numero_item: "25", descricao: "Eletroduto de ferro galvanizado ou flexível corrugado tipo 'Seal Tube', até 1 polegada", unidade: "Metro Linear", quantidade: 846005, preco_unitario: 19.66, ativo: true, ordem: 3, executavel: true, created_at: null, updated_at: null },
+  { id: "4", ata_id: "default", lote_id: "lote2", numero_item: "26", descricao: "Eletroduto de ferro galvanizado ou flexível corrugado tipo 'Seal Tube', de 1 1/4 até 3 polegadas", unidade: "Metro Linear", quantidade: 235097, preco_unitario: 41.50, ativo: true, ordem: 4, executavel: true, created_at: null, updated_at: null },
+  { id: "5", ata_id: "default", lote_id: "lote2", numero_item: "27", descricao: "Eletrocalha metálica galvanizada de 25mm até 400mm (L) x 25mm até 100mm (H)", unidade: "Metro Linear", quantidade: 186374, preco_unitario: 117.95, ativo: true, ordem: 5, executavel: true, created_at: null, updated_at: null },
+  { id: "6", ata_id: "default", lote_id: "lote2", numero_item: "28", descricao: "Canaleta em material metálico galvanizado/alumínio, tampada e septada", unidade: "Metro Linear", quantidade: 164455, preco_unitario: 129.74, ativo: true, ordem: 6, executavel: true, created_at: null, updated_at: null },
+  { id: "7", ata_id: "default", lote_id: "lote2", numero_item: "29", descricao: "Canaleta de piso em PVC rígido autoextinguível", unidade: "Metro Linear", quantidade: 99040, preco_unitario: 87.15, ativo: true, ordem: 7, executavel: true, created_at: null, updated_at: null },
+  { id: "8", ata_id: "default", lote_id: "lote2", numero_item: "30", descricao: "Cabo UTP CAT6, 4 pares em eletroduto", unidade: "Metro Linear", quantidade: 1408850, preco_unitario: 9.31, ativo: true, ordem: 8, executavel: true, created_at: null, updated_at: null },
+  { id: "9", ata_id: "default", lote_id: "lote2", numero_item: "31", descricao: "Cabo UTP CAT5E, 4 pares em eletroduto", unidade: "Metro Linear", quantidade: 229305, preco_unitario: 8.51, ativo: true, ordem: 9, executavel: true, created_at: null, updated_at: null },
+  { id: "10", ata_id: "default", lote_id: "lote2", numero_item: "32", descricao: "Ponto de rede óptico, 6 fibras, 3 pares", unidade: "Metro Linear", quantidade: 23952, preco_unitario: 20.64, ativo: true, ordem: 10, executavel: true, created_at: null, updated_at: null },
 ];
 
 const defaultLotes: Lote[] = [
-  { id: "lote2", numero: "2", descricao: "Cabeamento Estruturado e Infraestrutura" },
-  { id: "lote4", numero: "4", descricao: null },
-  { id: "lote5", numero: "5", descricao: null },
+  { id: "lote2", ata_id: "default", numero: "2", descricao: "Cabeamento Estruturado e Infraestrutura", ativo: true, ordem: 1, created_at: null },
+  { id: "lote4", ata_id: "default", numero: "4", descricao: null, ativo: true, ordem: 2, created_at: null },
+  { id: "lote5", ata_id: "default", numero: "5", descricao: null, ativo: true, ordem: 3, created_at: null },
 ];
 
 export default function AtaApresentacao({
@@ -126,6 +137,7 @@ export default function AtaApresentacao({
     // Carregar Leaflet dinamicamente apenas no cliente
     if (typeof window !== "undefined") {
       // Importar CSS do Leaflet
+      // @ts-expect-error CSS import doesn't have types
       import("leaflet/dist/leaflet.css");
       // Importar módulo Leaflet
       import("leaflet").then((L) => {
@@ -720,7 +732,7 @@ export default function AtaApresentacao({
                     </td>
                     <td className="px-6 py-4 text-right align-top">
                       <p className="text-[#211915] font-bold text-base">
-                        {formatCurrency(item.preco_unitario)}
+                        {formatCurrency(item.preco_unitario ?? 0)}
                       </p>
                     </td>
                   </tr>

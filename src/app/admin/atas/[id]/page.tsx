@@ -80,8 +80,9 @@ interface Lote {
   ata_id: string
   numero: string
   descricao: string | null
-  ativo: boolean
-  ordem: number
+  ativo: boolean | null
+  ordem: number | null
+  created_at: string | null
 }
 
 interface Item {
@@ -91,11 +92,13 @@ interface Item {
   numero_item: string
   descricao: string
   unidade: string
-  quantidade: number
-  preco_unitario: number
-  ativo: boolean
-  ordem: number
-  executavel: boolean
+  quantidade: number | null
+  preco_unitario: number | null
+  ativo: boolean | null
+  ordem: number | null
+  executavel: boolean | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 interface ItemImagem {
@@ -103,8 +106,8 @@ interface ItemImagem {
   item_id: string
   url: string
   nome_arquivo: string | null
-  descricao: string | null
-  ordem: number
+  ordem: number | null
+  created_at: string | null
 }
 
 const statusConfig: Record<string, { label: string; color: string }> = {
@@ -390,9 +393,9 @@ export default function VisualizarAtaPage() {
   }
 
   // Calcular valores
-  const valorTotal = itens.reduce((acc, item) => acc + (item.quantidade * item.preco_unitario), 0)
+  const valorTotal = itens.reduce((acc, item) => acc + ((item.quantidade ?? 0) * (item.preco_unitario ?? 0)), 0)
   const itensExecutaveis = itens.filter(item => item.executavel)
-  const valorExecutavel = itensExecutaveis.reduce((acc, item) => acc + (item.quantidade * item.preco_unitario), 0)
+  const valorExecutavel = itensExecutaveis.reduce((acc, item) => acc + ((item.quantidade ?? 0) * (item.preco_unitario ?? 0)), 0)
 
   if (loading) {
     return (
@@ -818,7 +821,7 @@ export default function VisualizarAtaPage() {
                               ? "bg-verde hover:bg-verde/90 text-preto h-8 px-3" 
                               : "h-8 px-3"
                             }
-                            onClick={() => toggleExecutavel(item.id, item.executavel)}
+                            onClick={() => toggleExecutavel(item.id, item.executavel ?? false)}
                           >
                             {item.executavel ? (
                               <>
@@ -848,10 +851,10 @@ export default function VisualizarAtaPage() {
                         </TableCell>
                         <TableCell className="text-sm text-cinza-escuro">{item.unidade}</TableCell>
                         <TableCell className="text-right font-medium">
-                          {item.quantidade.toLocaleString("pt-BR")}
+                          {(item.quantidade ?? 0).toLocaleString("pt-BR")}
                         </TableCell>
                         <TableCell className="text-right text-verde font-medium">
-                          {item.preco_unitario.toLocaleString("pt-BR", {
+                          {(item.preco_unitario ?? 0).toLocaleString("pt-BR", {
                             style: "currency",
                             currency: "BRL",
                           })}

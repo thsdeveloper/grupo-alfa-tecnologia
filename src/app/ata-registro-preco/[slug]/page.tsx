@@ -34,19 +34,28 @@ interface Ata {
 
 interface Lote {
   id: string;
+  ata_id: string;
   numero: string;
   descricao: string | null;
+  ativo: boolean | null;
+  ordem: number | null;
+  created_at: string | null;
 }
 
 interface Item {
   id: string;
+  ata_id: string;
   lote_id: string | null;
   numero_item: string;
   descricao: string;
   unidade: string;
-  quantidade: number;
-  preco_unitario: number;
-  executavel: boolean;
+  quantidade: number | null;
+  preco_unitario: number | null;
+  ativo: boolean | null;
+  ordem: number | null;
+  executavel: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 interface ItemImagem {
@@ -54,7 +63,8 @@ interface ItemImagem {
   item_id: string;
   url: string;
   nome_arquivo: string | null;
-  descricao: string | null;
+  ordem: number | null;
+  created_at: string | null;
 }
 
 export default function AtaDetalhe() {
@@ -453,10 +463,10 @@ export default function AtaDetalhe() {
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 text-right text-[#211915]/70">
-                                  {item.quantidade.toLocaleString("pt-BR")}
+                                  {(item.quantidade ?? 0).toLocaleString("pt-BR")}
                                 </td>
                                 <td className="px-6 py-4 text-right font-semibold text-[#b6c72c]">
-                                  {item.preco_unitario.toLocaleString("pt-BR", {
+                                  {(item.preco_unitario ?? 0).toLocaleString("pt-BR", {
                                     style: "currency",
                                     currency: "BRL",
                                   })}
@@ -499,10 +509,10 @@ export default function AtaDetalhe() {
                               </span>
                             </td>
                             <td className="px-6 py-4 text-right text-[#211915]/70">
-                              {item.quantidade.toLocaleString("pt-BR")}
+                              {(item.quantidade ?? 0).toLocaleString("pt-BR")}
                             </td>
                             <td className="px-6 py-4 text-right font-semibold text-[#b6c72c]">
-                              {item.preco_unitario.toLocaleString("pt-BR", {
+                              {(item.preco_unitario ?? 0).toLocaleString("pt-BR", {
                                 style: "currency",
                                 currency: "BRL",
                               })}
@@ -541,7 +551,7 @@ export default function AtaDetalhe() {
                     >
                       <Image
                         src={img.url}
-                        alt={img.descricao || item?.descricao || "Imagem do serviço"}
+                        alt={img.nome_arquivo || item?.descricao || "Imagem do serviço"}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -554,7 +564,7 @@ export default function AtaDetalhe() {
                             </span>
                           )}
                           <p className="text-white font-medium text-sm leading-relaxed line-clamp-2">
-                            {img.descricao || item?.descricao}
+                            {img.nome_arquivo || item?.descricao}
                           </p>
                         </div>
                       </div>
