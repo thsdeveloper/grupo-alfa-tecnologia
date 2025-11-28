@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      candidaturas: {
+        Row: {
+          cenario_atual: string
+          cpf: string
+          created_at: string | null
+          curriculo_nome_original: string | null
+          curriculo_url: string
+          data_nascimento: string
+          endereco_completo: string
+          escolaridade: string
+          id: string
+          indicacao: string | null
+          nome_completo: string
+          possui_cnh: boolean | null
+          possui_experiencia: boolean | null
+          pretensao_salarial: number | null
+          status: string | null
+          telefone: string
+          tipo_cnh: string | null
+          vaga_id: string
+        }
+        Insert: {
+          cenario_atual: string
+          cpf: string
+          created_at?: string | null
+          curriculo_nome_original?: string | null
+          curriculo_url: string
+          data_nascimento: string
+          endereco_completo: string
+          escolaridade: string
+          id?: string
+          indicacao?: string | null
+          nome_completo: string
+          possui_cnh?: boolean | null
+          possui_experiencia?: boolean | null
+          pretensao_salarial?: number | null
+          status?: string | null
+          telefone: string
+          tipo_cnh?: string | null
+          vaga_id: string
+        }
+        Update: {
+          cenario_atual?: string
+          cpf?: string
+          created_at?: string | null
+          curriculo_nome_original?: string | null
+          curriculo_url?: string
+          data_nascimento?: string
+          endereco_completo?: string
+          escolaridade?: string
+          id?: string
+          indicacao?: string | null
+          nome_completo?: string
+          possui_cnh?: boolean | null
+          possui_experiencia?: boolean | null
+          pretensao_salarial?: number | null
+          status?: string | null
+          telefone?: string
+          tipo_cnh?: string | null
+          vaga_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidaturas_vaga_id_fkey"
+            columns: ["vaga_id"]
+            isOneToOne: false
+            referencedRelation: "vagas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       equipamentos: {
         Row: {
           ativo: boolean | null
@@ -442,6 +513,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vagas: {
+        Row: {
+          ativo: boolean | null
+          beneficios: string | null
+          created_at: string | null
+          descricao: string | null
+          id: string
+          local: string | null
+          requisitos: string | null
+          tipo_contrato: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          beneficios?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          local?: string | null
+          requisitos?: string | null
+          tipo_contrato: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          beneficios?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          local?: string | null
+          requisitos?: string | null
+          tipo_contrato?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {

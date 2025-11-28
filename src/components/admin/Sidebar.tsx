@@ -9,6 +9,7 @@ import {
   User,
   FileText,
   Package,
+  Briefcase,
   ChevronLeft,
   ChevronRight
 } from "lucide-react"
@@ -33,6 +34,11 @@ const menuItems = [
     title: "Equipamentos",
     href: "/admin/equipamentos",
     icon: Package,
+  },
+  {
+    title: "Vagas",
+    href: "/admin/vagas",
+    icon: Briefcase,
   },
   {
     title: "Meu Perfil",
