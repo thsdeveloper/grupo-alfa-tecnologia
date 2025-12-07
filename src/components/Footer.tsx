@@ -21,6 +21,7 @@ export default function Footer() {
     { label: "Portfólio", href: "/#portfolio", title: "Projetos executados em órgãos públicos", isPage: false },
     { label: "Diferenciais", href: "/#diferenciais", title: `Por que escolher o ${settings.company_short_name}`, isPage: false },
     { label: "Ata de Registro de Preço", href: "/ata-registro-preco", title: "Informações sobre ARP para contratação direta", isPage: true },
+    { label: "Carreiras", href: "/carreiras", title: "Oportunidades de emprego - Trabalhe conosco", isPage: true },
     { label: "Contato", href: "/#contato", title: "Entre em contato conosco", isPage: false },
   ];
 
