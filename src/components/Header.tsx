@@ -42,29 +42,34 @@ export default function Header() {
     // Reset mounted ref on each effect run
     isMountedRef.current = true;
 
-    // Check initial auth state
-    const getUser = async () => {
+    // Check initial auth state using getSession (faster than getUser)
+    const initAuth = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        // First check local session (faster)
+        const { data: { session } } = await supabase.auth.getSession();
 
         // Only update state if component is still mounted
         if (!isMountedRef.current) return;
 
-        setUser(user);
+        if (session?.user) {
+          setUser(session.user);
 
-        if (user) {
-          const { data: profile } = await supabase
+          // Fetch profile data
+          const { data: profileData } = await supabase
             .from("profiles")
             .select("full_name, avatar_url")
-            .eq("id", user.id)
+            .eq("id", session.user.id)
             .single();
 
           if (isMountedRef.current) {
-            setProfile(profile);
+            setProfile(profileData);
           }
+        } else {
+          setUser(null);
+          setProfile(null);
         }
       } catch (error) {
-        console.error("Error fetching user:", error);
+        console.error("Error fetching session:", error);
       } finally {
         if (isMountedRef.current) {
           setLoading(false);
@@ -72,7 +77,7 @@ export default function Header() {
       }
     };
 
-    getUser();
+    initAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -175,10 +180,11 @@ export default function Header() {
             </Link>
 
             {/* Auth Section */}
-            {!loading && (
-              <>
-                {user ? (
-                  <DropdownMenu>
+            {loading ? (
+              // Loading skeleton for avatar
+              <div className="h-9 w-9 rounded-full bg-white/10 animate-pulse border-2 border-white/20" />
+            ) : user ? (
+              <DropdownMenu>
                     <DropdownMenuTrigger className="flex items-center gap-2 rounded-full hover:ring-2 hover:ring-[#b6c72c]/50 transition-all focus:outline-none focus:ring-2 focus:ring-[#b6c72c]">
                       <Avatar className="h-9 w-9 border-2 border-[#b6c72c]">
                         <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
@@ -229,17 +235,16 @@ export default function Header() {
                     <LogIn className="h-4 w-4" />
                     Entrar
                   </Link>
-                )}
-              </>
             )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="lg:hidden flex items-center gap-3">
             {/* Mobile Auth */}
-            {!loading && (
-              <>
-                {user ? (
+            {loading ? (
+              // Loading skeleton for mobile avatar
+              <div className="h-8 w-8 rounded-full bg-white/10 animate-pulse border-2 border-white/20" />
+            ) : user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger className="flex items-center rounded-full hover:ring-2 hover:ring-[#b6c72c]/50 transition-all focus:outline-none focus:ring-2 focus:ring-[#b6c72c]">
                       <Avatar className="h-8 w-8 border-2 border-[#b6c72c]">
@@ -290,8 +295,6 @@ export default function Header() {
                   >
                     <LogIn className="h-5 w-5" />
                   </Link>
-                )}
-              </>
             )}
 
             <button
