@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,7 +24,11 @@ export default function Header() {
   const [loading, setLoading] = useState(true);
   const { settings } = useOrganizationSettings();
 
-  const supabase = createClient();
+  // Memoize supabase client to prevent recreation on each render
+  const supabase = useMemo(() => createClient(), []);
+
+  // Ref to track if component is mounted (prevents state updates after unmount)
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,41 +39,70 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
+    // Reset mounted ref on each effect run
+    isMountedRef.current = true;
+
     // Check initial auth state
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
 
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name, avatar_url")
-          .eq("id", user.id)
-          .single();
-        setProfile(profile);
+        // Only update state if component is still mounted
+        if (!isMountedRef.current) return;
+
+        setUser(user);
+
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name, avatar_url")
+            .eq("id", user.id)
+            .single();
+
+          if (isMountedRef.current) {
+            setProfile(profile);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
     };
 
     getUser();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMountedRef.current) return;
+
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name, avatar_url")
-          .eq("id", session.user.id)
-          .single();
-        setProfile(profile);
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name, avatar_url")
+            .eq("id", session.user.id)
+            .single();
+
+          if (isMountedRef.current) {
+            setProfile(profile);
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
       } else {
         setProfile(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMountedRef.current = false;
+      subscription.unsubscribe();
+    };
   }, [supabase]);
 
   const handleSignOut = async () => {
